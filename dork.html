@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Neo Dork Builder — Futuristic Google Dorks Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070914;
+      --panel:#0e1324cc;
+      --panel-solid:#0e1324;
+      --text:#eef3ff;
+      --muted:#93a0c9;
+      --accent1:#6ef3ff;
+      --accent2:#9b5cff;
+      --accent3:#19ffa5;
+      --danger:#ff5c7a;
+      --ring: 0 0 0 2px rgba(110,243,255,.25), 0 0 24px rgba(155,92,255,.25);
+      --glass: backdrop-filter: blur(14px) saturate(130%);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(110,243,255,.07), transparent 60%),
+        radial-gradient(1000px 600px at 90% 20%, rgba(155,92,255,.08), transparent 60%),
+        radial-gradient(1000px 600px at 30% 90%, rgba(25,255,165,.06), transparent 60%),
+        linear-gradient(180deg, #060713 0%, #080a16 60%, #060713 100%);
+      color:var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      overflow-y:auto;
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 18px 60px;
+    }
+    header{
+      display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:22px
+    }
+    .brand{
+      display:flex;align-items:center;gap:14px
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background:
+        conic-gradient(from 210deg, var(--accent2), var(--accent1), var(--accent3), var(--accent2));
+      box-shadow: 0 0 28px rgba(110,243,255,.35), inset 0 0 18px rgba(0,0,0,.45);
+      position:relative;overflow:hidden
+    }
+    .logo::after{
+      content:"";position:absolute;inset:2px;border-radius:12px;background:#0a0f20
+    }
+    h1{
+      margin:0;font-family:Orbitron, sans-serif;letter-spacing:0.8px;font-weight:800;font-size:clamp(20px,3vw,28px)
+    }
+    .tag{
+      font-size:12px;color:var(--muted);margin-top:2px
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background: linear-gradient(180deg, rgba(14,19,36,.75), rgba(14,19,36,.6));
+      border:1px solid rgba(110,243,255,.13);
+      border-radius:18px;padding:18px; box-shadow: var(--ring); position:relative;
+      --shadow-accent: drop-shadow(0 0 18px rgba(110,243,255,.15));
+      filter: var(--shadow-accent);
+      /* glass */
+      backdrop-filter: blur(16px) saturate(130%);
+    }
+    .card h2{
+      margin:0 0 12px;font-family:Orbitron, sans-serif;font-size:16px;font-weight:700;letter-spacing:.6px
+    }
+    .row{ display:grid; grid-template-columns: repeat(12, 1fr); gap:12px; margin-bottom:12px }
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type="text"], select, textarea{
+      width:100%; background:#0b1022; color:var(--text); border:1px solid rgba(110,243,255,.18);
+      border-radius:12px; padding:12px 13px; outline:none; font-size:14px; font-family:Inter, sans-serif;
+      transition: .2s border, .2s box-shadow;
+    }
+    textarea{ min-height:88px; resize:vertical }
+    input:focus, select:focus, textarea:focus{ border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(110,243,255,.15) }
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(155,92,255,.25);background:linear-gradient(180deg, rgba(155,92,255,.12), rgba(110,243,255,.08));
+      font-size:13px;cursor:pointer;user-select:none;transition:.15s transform;
+    }
+    .chip:hover{ transform: translateY(-1px) }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px }
+    .muted{ color:var(--muted); font-size:12px }
+    .btn{
+      appearance:none; border:none; cursor:pointer; color:#07111a; font-weight:800;
+      padding:12px 16px; border-radius:14px; letter-spacing:.4px; font-family:Orbitron, sans-serif;
+      background: linear-gradient(90deg, var(--accent3), var(--accent1));
+      box-shadow: 0 8px 24px rgba(110,243,255,.22), inset 0 -2px 0 rgba(255,255,255,.35);
+      transition:.15s transform, .15s filter;
+    }
+    .btn:hover{ transform: translateY(-1px) }
+    .btn:active{ transform: translateY(0) }
+    .btn.ghost{
+      background: transparent; color: var(--text);
+      border:1px dashed rgba(110,243,255,.35)
+    }
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
+    .preview{
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      background:#050914; border:1px solid rgba(110,243,255,.2); border-radius:14px; padding:14px; min-height:72px;
+      line-height:1.6; word-break:break-word
+    }
+    .pill{
+      display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px;
+      background:linear-gradient(90deg, rgba(110,243,255,.18), rgba(155,92,255,.18));
+      border:1px solid rgba(110,243,255,.25); margin-left:auto; color:var(--muted)
+    }
+    .footer{
+      margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end
+    }
+    .link{
+      color:var(--accent1); text-decoration:none; font-weight:600
+    }
+    .hr{ height:1px; background:linear-gradient(90deg, transparent, rgba(110,243,255,.25), transparent); margin:14px 0 }
+    .section-title{display:flex; align-items:center; gap:10px}
+    .section-title .bar{height:10px; width:10px; border-radius:3px; background:linear-gradient(90deg,var(--accent2),var(--accent1))}
+    .badge{
+      padding:6px 10px;border-radius:12px;border:1px solid rgba(110,243,255,.25);
+      background:linear-gradient(180deg, rgba(110,243,255,.06), rgba(155,92,255,.06));
+      font-size:12px;color:var(--muted)
+    }
+    .swap{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px;
+      border:1px solid rgba(110,243,255,.25); cursor:pointer; user-select:none;
+    }
+    .switch{
+      width:44px; height:24px; background:#0a1020; border:1px solid rgba(110,243,255,.25); border-radius:999px; position:relative
+    }
+    .switch::after{
+      content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:999px; background:linear-gradient(180deg, #cfffff, #9bf8ff);
+      transition:.2s left, .2s background
+    }
+    .switch[data-on="1"]::after{ left:22px; background:linear-gradient(180deg, #d9c7ff, #bfa0ff) }
+    .small{ font-size:11px; color: var(--muted) }
+    .warn{ color: var(--danger) }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Neo Dork Builder</h1>
+          <div class="tag">Futuristic Google Dorks generator — compose, preview, and launch</div>
+        </div>
+      </div>
+      <div class="pill">OSINT • Research • Debugging</div>
+    </header>
+
+    <div class="grid">
+      <!-- Builder -->
+      <section class="card" aria-label="Builder">
+        <h2 class="section-title"><span class="bar"></span>Query Composer</h2>
+
+        <div class="row">
+          <div style="grid-column: span 6;">
+            <label for="keywords">Keywords (space-separated)</label>
+            <input id="keywords" type="text" placeholder="server logs errors" />
+          </div>
+          <div style="grid-column: span 6;">
+            <label for="phrase">Exact phrase (quoted)</label>
+            <input id="phrase" type="text" placeholder="&quot;internal training manual&quot;" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="grid-column: span 6;">
+            <label for="exclude">Exclude terms (prefixed with -)</label>
+            <input id="exclude" type="text" placeholder="draft -sample -template" />
+          </div>
+          <div style="grid-column: span 3;">
+            <label for="site">site:</label>
+            <input id="site" type="text" placeholder="example.com or *.edu" />
+          </div>
+          <div style="grid-column: span 3;">
+            <label for="inurl">inurl:</label>
+            <input id="inurl" type="text" placeholder="login | admin | viewer" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="grid-column: span 4;">
+            <label for="intitle">intitle:</label>
+            <input id="intitle" type="text" placeholder="index of / receipts" />
+          </div>
+          <div style="grid-column: span 4;">
+            <label for="filetype">filetype:</label>
+            <input id="filetype" type="text" placeholder="pdf, xlsx, env, log" />
+          </div>
+          <div style="grid-column: span 4;">
+            <label for="ext">ext: (alt to filetype)</label>
+            <input id="ext" type="text" placeholder="docx, csv" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="grid-column: span 4;">
+            <label for="orBlock">OR group (uses parentheses)</label>
+            <input id="orBlock" type="text" placeholder="invoice OR receipt OR bill" />
+          </div>
+          <div style="grid-column: span 4;">
+            <label for="country">Country TLD (optional)</label>
+            <select id="country">
+              <option value="">— none —</option>
+              <option value="site:.lk">Sri Lanka (.lk)</option>
+              <option value="site:.uk">United Kingdom (.uk)</option>
+              <option value="site:.in">India (.in)</option>
+              <option value="site:.au">Australia (.au)</option>
+              <option value="site:.sg">Singapore (.sg)</option>
+              <option value="site:.edu">Academic (.edu)</option>
+              <option value="site:.gov">Government (.gov)</option>
+            </select>
+          </div>
+          <div style="grid-column: span 4;">
+            <label for="time">Freshness (Google <em>qdr</em>)</label>
+            <select id="time">
+              <option value="">Any time</option>
+              <option value="&tbs=qdr:h">Past hour</option>
+              <option value="&tbs=qdr:d">Past 24 hours</option>
+              <option value="&tbs=qdr:w">Past week</option>
+              <option value="&tbs=qdr:m">Past month</option>
+              <option value="&tbs=qdr:y">Past year</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="grid-column: span 12;">
+            <label for="raw">Raw add-on (advanced)</label>
+            <input id="raw" type="text" placeholder='related:example.com cache:example.com "wildcards * work"' />
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <div style="grid-column: span 12;">
+            <label>Quick Presets</label>
+            <div class="chips" id="presets">
+              <div class="chip" data-preset='intitle:"index of" OR inurl:"index of" -inurl:(jsp|php|html)'>“index of” directories</div>
+              <div class="chip" data-preset='intitle:"login" OR inurl:login -site:facebook.com -site:google.com'>Login portals (generic)</div>
+              <div class="chip" data-preset='filetype:pdf (resume OR cv) "software engineer" -template -sample'>Resumes PDF (SE)</div>
+              <div class="chip" data-preset='filetype:xlsx (sales OR revenue) (2024|2025) -template -sample'>Financial sheets</div>
+              <div class="chip" data-preset='inurl:admin (dashboard OR panel) -github -stackoverflow'>Admin dashboards</div>
+              <div class="chip" data-preset='"confidential" OR "internal use only" -site:google.com -site:microsoft.com'>Internal markers</div>
+              <div class="chip" data-preset='ext:env "SECRET_KEY" OR "API_KEY" -github -gitlab'>ENV keys (code)</div>
+              <div class="chip" data-preset='site:docs.google.com "Anyone with the link" -owner:"@gmail.com"'>Open GDrive docs</div>
+            </div>
+            <div class="small warn" style="margin-top:8px">Use ethically. Don’t exploit sensitive data. Respect laws and terms of service.</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="footer">
+          <div class="swap" id="encodeToggle">
+            <span class="small">URL-encode</span>
+            <div class="switch" id="encodeSwitch" data-on="1" aria-label="URL encode toggle"></div>
+          </div>
+          <button class="btn" id="build">Build query</button>
+          <button class="btn ghost" id="clear">Clear</button>
+        </div>
+      </section>
+
+      <!-- Preview -->
+      <section class="card" aria-label="Preview">
+        <h2 class="section-title"><span class="bar"></span>Preview & Actions</h2>
+
+        <div class="row">
+          <div style="grid-column: span 12;">
+            <label>Google query</label>
+            <div class="preview" id="preview" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="grid-column: span 12;">
+            <label>Google link</label>
+            <input id="link" type="text" readonly />
+          </div>
+        </div>
+
+        <div class="footer">
+          <button class="btn" id="open">Open in Google</button>
+          <button class="btn ghost" id="copy">Copy link</button>
+          <button class="btn ghost" id="copyQuery">Copy query</button>
+          <span class="badge" id="status">Ready</span>
+        </div>
+
+        <div class="hr"></div>
+        <div class="muted">
+          Tips:
+          <ul>
+            <li>Use quotes for exact phrases. Prefix exclusions with <code>-</code>.</li>
+            <li>Group synonyms with parentheses and <code>OR</code>.</li>
+            <li>Combine <code>site:</code>, <code>inurl:</code>, <code>intitle:</code>, <code>filetype:</code> for precision.</li>
+            <li>Freshness filter adds a Google <code>tbs</code> parameter (e.g., past month).</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px" aria-label="Notebook">
+      <h2 class="section-title"><span class="bar"></span>Scratchpad</h2>
+      <label for="notes">Hold ideas, keywords, and sources here</label>
+      <textarea id="notes" placeholder="e.g., site:gov.lk procurement pdf 2023 OR 2024, exclude: draft sample template"></textarea>
+      <div class="footer">
+        <button class="btn ghost" id="saveNotes">Save notes (local)</button>
+        <span class="small" id="noteStatus">Not saved</span>
+      </div>
+    </section>
+
+    <footer style="margin-top:18px; text-align:center; color:var(--muted); font-size:12px">
+      Built for research & OSINT. Respect robots.txt, platform ToS, and local laws.
+    </footer>
+  </div>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const enc = s => encodeURIComponent(s).replace(/%20/g, '+'); // Google-friendly
+    const dedupeSpaces = s => s.replace(/\s+/g,' ').trim();
+
+    const fields = {
+      keywords: $('#keywords'),
+      phrase: $('#phrase'),
+      exclude: $('#exclude'),
+      site: $('#site'),
+      inurl: $('#inurl'),
+      intitle: $('#intitle'),
+      filetype: $('#filetype'),
+      ext: $('#ext'),
+      orBlock: $('#orBlock'),
+      country: $('#country'),
+      time: $('#time'),
+      raw: $('#raw')
+    };
+
+    const preview = $('#preview');
+    const link = $('#link');
+    const status = $('#status');
+    const encodeSwitch = $('#encodeSwitch');
+    const encodeToggle = $('#encodeToggle');
+
+    function tokens(){
+      const parts = [];
+
+      // keywords
+      if (fields.keywords.value.trim()){
+        parts.push(dedupeSpaces(fields.keywords.value.trim()));
+      }
+      // phrase
+      if (fields.phrase.value.trim()){
+        const p = fields.phrase.value.trim();
+        const quoted = p.startsWith('"') && p.endsWith('"') ? p : `"${p}"`;
+        parts.push(quoted);
+      }
+      // exclude (allow user to include minus or not)
+      if (fields.exclude.value.trim()){
+        const ex = fields.exclude.value.trim().split(/\s+/).map(t => t.startsWith('-') ? t : '-'+t);
+        parts.push(ex.join(' '));
+      }
+      // site and TLD country together if both
+      const siteVal = fields.site.value.trim();
+      const countryVal = fields.country.value.trim(); // this carries "site:.xx" when selected
+      if (siteVal && countryVal){
+        parts.push(`(${`site:${siteVal}`} OR ${countryVal})`);
+      } else if (siteVal){
+        parts.push(`site:${siteVal}`);
+      } else if (countryVal){
+        parts.push(countryVal);
+      }
+      // inurl / intitle
+      if (fields.inurl.value.trim()){
+        parts.push(`inurl:${fields.inurl.value.trim()}`);
+      }
+      if (fields.intitle.value.trim()){
+        parts.push(`intitle:${fields.intitle.value.trim()}`);
+      }
+      // filetype / ext
+      if (fields.filetype.value.trim()){
+        parts.push(`filetype:${fields.filetype.value.trim()}`);
+      }
+      if (fields.ext.value.trim()){
+        parts.push(`ext:${fields.ext.value.trim()}`);
+      }
+      // OR block
+      if (fields.orBlock.value.trim()){
+        const b = fields.orBlock.value.trim();
+        // If user already added parentheses, keep; else wrap
+        const wrapped = /^[\s(].*[\s)]$/.test(b) || b.includes(' OR ') ? `(${b})` : `(${b} OR ?)`;
+        parts.push(wrapped);
+      }
+      // raw
+      if (fields.raw.value.trim()){
+        parts.push(fields.raw.value.trim());
+      }
+
+      return dedupeSpaces(parts.join(' '));
+    }
+
+    function build(){
+      const q = tokens();
+      const shouldEncode = encodeSwitch.getAttribute('data-on') === '1';
+      const tbs = fields.time.value; // already formatted as &tbs=qdr:*
+      let queryParam = shouldEncode ? enc(q) : q;
+      const url = `https://www.google.com/search?q=${queryParam}${tbs}`;
+      preview.textContent = q || '—';
+      link.value = url;
+      status.textContent = q ? 'Built' : 'Empty';
+    }
+
+    function clearAll(){
+      Object.values(fields).forEach(el => { el.value = ''; });
+      $('#country').value = '';
+      $('#time').value = '';
+      preview.textContent = '';
+      link.value = '';
+      status.textContent = 'Cleared';
+    }
+
+    // Presets
+    $('#presets').addEventListener('click', (e)=>{
+      const target = e.target.closest('.chip');
+      if(!target) return;
+      const p = target.getAttribute('data-preset');
+      fields.raw.value = fields.raw.value ? fields.raw.value + ' ' + p : p;
+      status.textContent = 'Preset added';
+      build();
+    });
+
+    // Toggles
+    encodeToggle.addEventListener('click', ()=>{
+      const on = encodeSwitch.getAttribute('data-on') === '1';
+      encodeSwitch.setAttribute('data-on', on ? '0' : '1');
+      build();
+    });
+
+    // Buttons
+    $('#build').addEventListener('click', build);
+    $('#clear').addEventListener('click', clearAll);
+    $('#open').addEventListener('click', ()=>{
+      if(!link.value){ status.textContent = 'Nothing to open'; return; }
+      window.open(link.value, '_blank','noopener,noreferrer');
+    });
+    $('#copy').addEventListener('click', async ()=>{
+      if(!link.value){ status.textContent = 'Nothing to copy'; return; }
+      await navigator.clipboard.writeText(link.value);
+      status.textContent = 'Link copied';
+    });
+    $('#copyQuery').addEventListener('click', async ()=>{
+      if(!preview.textContent.trim()){ status.textContent = 'Nothing to copy'; return; }
+      await navigator.clipboard.writeText(preview.textContent.trim());
+      status.textContent = 'Query copied';
+    });
+
+    // Live build on input
+    Object.values(fields).forEach(el => el.addEventListener('input', build));
+    $('#country').addEventListener('change', build);
+    $('#time').addEventListener('change', build);
+
+    // Notes local storage
+    const notes = $('#notes');
+    const noteKey = 'neo_dork_notes_v1';
+    function loadNotes(){ const v = localStorage.getItem(noteKey); if(v){ notes.value = v; $('#noteStatus').textContent = 'Loaded'; } }
+    function saveNotes(){ localStorage.setItem(noteKey, notes.value || ''); $('#noteStatus').textContent = 'Saved locally'; }
+    $('#saveNotes').addEventListener('click', saveNotes);
+    loadNotes();
+
+    // Initial build
+    build();
+  </script>
+</body>
+</html>
